@@ -1,4 +1,4 @@
-import van from "https://cdn.jsdelivr.net/gh/vanjs-org/mini-van/public/mini-van-0.5.6.min.js";
+import van from "https://cdn.jsdelivr.net/gh/vanjs-org/van/public/van-1.5.0.min.js";
 const {a, button, div, footer, h1, h2} = van.tags;
 
 const state = {
@@ -20,32 +20,50 @@ function next() {
 
 const Quiz = () => {
   const lower = next();
+  // MAYBE have different question domains, with {question, answer, options}
 
-  const answers = [];
+  const options = [];
   for (let c = "A"; c <= "Z"; c = String.fromCharCode(c.charCodeAt(0) + 1)) {
-    answers.push(c);
+    options.push(c);
   }
   for (let i = 0; i <= 9; i++) {
-    answers.push(i);
+    options.push(i);
   }
 
   // TODO add onclick right right/wrong feedback
 
-  return div([
+  const answer = lower.toUpperCase();
+  function onclick(e) {
+    const closest = e.target.closest("button");
+    if (!closest) {
+      console.log("no button clicked");
+      return
+    }
+    const choice = closest.innerText;
+    if (choice !== answer) {
+      console.log(`Wrong expected ${answer} got ${choice}`);
+      return;
+    }
+    console.log("Correct!");
+  }
+
+  return div(
     h2("capital " + lower + " ?"),
     div(
-      {style: "display: grid; grid-template-columns: repeat(6, 1fr); grid-gap: 2em;"},
-      answers.map(answer => button(answer))
-    ),
-  ]);
+      {
+        onclick,
+        style: "display: grid; grid-template-columns: repeat(6, 1fr); grid-gap: 2em;",
+      },
+      options.map(answer => button(answer))
+    ));
 };
 
 const App = () => {
-  return [
+  return div(
     h1("QuizQuail"),
     Quiz(),
     footer(a({href: "https://github.com/darthwalsh/QuizQuail"}, "Contact on Github")),
-  ];
+  );
 };
 
 van.add(document.body, App());
